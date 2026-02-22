@@ -28,6 +28,7 @@ export type AnimalesStackParamList = {
   AnimalesList: undefined;
   AnimalDetail: { id: string };
   AnimalForm: { id?: string };
+  AnimalEventos: { id: string; nombre?: string };
 };
 
 // Produccion Stack

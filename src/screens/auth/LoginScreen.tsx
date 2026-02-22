@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { TextInput, Button, Text, HelperText } from 'react-native-paper';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { login } from '@/services/firebase/authService';
 import { Colors } from '@/constants/colors';
 import type { AuthScreenProps } from '@/navigation/types';
@@ -43,8 +44,9 @@ export function LoginScreen({ navigation }: AuthScreenProps<'Login'>) {
     >
       <ScrollView contentContainerStyle={styles.container}>
         <View style={styles.header}>
+          <Icon name="cow" size={64} color={Colors.primary} />
           <Text style={styles.appName}>FincaApp</Text>
-          <Text style={styles.subtitle}>Gestión Agropecuaria</Text>
+          <Text style={styles.subtitle}>Gesti\u00f3n Agropecuaria</Text>
         </View>
 
         <View style={styles.form}>
@@ -88,8 +90,9 @@ export function LoginScreen({ navigation }: AuthScreenProps<'Login'>) {
             disabled={loading}
             style={styles.button}
             contentStyle={styles.buttonContent}
+            icon="login"
           >
-            Iniciar Sesión
+            Iniciar Sesi\u00f3n
           </Button>
 
           <Button

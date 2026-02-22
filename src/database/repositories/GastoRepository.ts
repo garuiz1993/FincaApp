@@ -1,7 +1,7 @@
 import { BaseRepository } from './BaseRepository';
 import type { Gasto, GastoInput } from '../models/Gasto';
 import type { SQLiteDatabase } from 'expo-sqlite';
-import { v4 as uuidv4 } from 'uuid';
+import { randomUUID } from 'expo-crypto';
 
 export class GastoRepository extends BaseRepository<Gasto> {
   constructor(db: SQLiteDatabase) {
@@ -9,7 +9,7 @@ export class GastoRepository extends BaseRepository<Gasto> {
   }
 
   async create(data: GastoInput): Promise<string> {
-    const id = uuidv4();
+    const id = randomUUID();
     await this.db.runAsync(
       `INSERT INTO gastos (id, fecha, categoria, descripcion, monto, proveedor, notas)
        VALUES (?, ?, ?, ?, ?, ?, ?)`,

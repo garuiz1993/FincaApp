@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { TextInput, Button, Text, HelperText } from 'react-native-paper';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { register } from '@/services/firebase/authService';
 import { Colors } from '@/constants/colors';
 import type { AuthScreenProps } from '@/navigation/types';
@@ -52,8 +53,9 @@ export function RegisterScreen({ navigation }: AuthScreenProps<'Register'>) {
     >
       <ScrollView contentContainerStyle={styles.container}>
         <View style={styles.header}>
+          <Icon name="account-plus" size={56} color={Colors.primary} />
           <Text style={styles.title}>Crear Cuenta</Text>
-          <Text style={styles.subtitle}>Regístrate para comenzar</Text>
+          <Text style={styles.subtitle}>Reg\u00edstrate para comenzar</Text>
         </View>
 
         <View style={styles.form}>
@@ -107,6 +109,7 @@ export function RegisterScreen({ navigation }: AuthScreenProps<'Register'>) {
             disabled={loading}
             style={styles.button}
             contentStyle={styles.buttonContent}
+            icon="account-check"
           >
             Registrarse
           </Button>

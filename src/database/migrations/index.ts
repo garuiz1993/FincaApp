@@ -150,5 +150,23 @@ async function createInitialSchema(db: SQLiteDatabase): Promise<void> {
     CREATE INDEX IF NOT EXISTS idx_ingresos_fecha ON ingresos(fecha);
     CREATE INDEX IF NOT EXISTS idx_tratamientos_animal ON tratamientos(id_animal);
     CREATE INDEX IF NOT EXISTS idx_animales_estado ON animales(estado);
+
+    CREATE TABLE IF NOT EXISTS eventos_animal (
+      id              TEXT PRIMARY KEY,
+      id_animal       TEXT NOT NULL,
+      tipo            TEXT NOT NULL,
+      fecha           TEXT NOT NULL,
+      descripcion     TEXT NOT NULL,
+      notas           TEXT,
+      created_at      TEXT NOT NULL DEFAULT (datetime('now')),
+      updated_at      TEXT NOT NULL DEFAULT (datetime('now')),
+      synced          INTEGER NOT NULL DEFAULT 0,
+      firebase_id     TEXT,
+      deleted         INTEGER NOT NULL DEFAULT 0,
+      FOREIGN KEY (id_animal) REFERENCES animales(id)
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_eventos_animal_animal ON eventos_animal(id_animal);
+    CREATE INDEX IF NOT EXISTS idx_eventos_animal_fecha ON eventos_animal(fecha);
   `);
 }

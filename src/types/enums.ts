@@ -35,6 +35,15 @@ export type TipoEventoReproductivo =
 // Resultado de evento reproductivo
 export type ResultadoEvento = 'positivo' | 'negativo' | 'pendiente';
 
+// Tipos de evento de animal
+export type TipoEventoAnimal =
+  | 'vacunacion'
+  | 'desparasitacion'
+  | 'tratamiento'
+  | 'revision'
+  | 'parto'
+  | 'otro';
+
 // Roles de usuario
 export type RolUsuario = 'propietario' | 'administrador' | 'trabajador';
 

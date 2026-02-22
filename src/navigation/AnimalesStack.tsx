@@ -3,6 +3,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { AnimalesListScreen } from '@/screens/animales/AnimalesListScreen';
 import { AnimalDetailScreen } from '@/screens/animales/AnimalDetailScreen';
 import { AnimalFormScreen } from '@/screens/animales/AnimalFormScreen';
+import { AnimalEventosScreen } from '@/screens/animales/AnimalEventosScreen';
 import type { AnimalesStackParamList } from './types';
 import { Colors } from '@/constants/colors';
 
@@ -33,6 +34,11 @@ export function AnimalesStack() {
         options={({ route }) => ({
           title: route.params?.id ? 'Editar Animal' : 'Nuevo Animal',
         })}
+      />
+      <Stack.Screen
+        name="AnimalEventos"
+        component={AnimalEventosScreen}
+        options={{ title: 'Historial de Eventos' }}
       />
     </Stack.Navigator>
   );

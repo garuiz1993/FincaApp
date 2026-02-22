@@ -1,7 +1,7 @@
 import { BaseRepository } from './BaseRepository';
 import type { Tratamiento, TratamientoInput } from '../models/Tratamiento';
 import type { SQLiteDatabase } from 'expo-sqlite';
-import { v4 as uuidv4 } from 'uuid';
+import { randomUUID } from 'expo-crypto';
 
 export class TratamientoRepository extends BaseRepository<Tratamiento> {
   constructor(db: SQLiteDatabase) {
@@ -9,7 +9,7 @@ export class TratamientoRepository extends BaseRepository<Tratamiento> {
   }
 
   async create(data: TratamientoInput): Promise<string> {
-    const id = uuidv4();
+    const id = randomUUID();
     await this.db.runAsync(
       `INSERT INTO tratamientos (id, id_animal, fecha, tipo, medicamento, dosis, costo, veterinario, proxima_fecha, notas)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,

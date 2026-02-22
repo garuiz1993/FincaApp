@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
-import { TextInput, Button, HelperText, SegmentedButtons } from 'react-native-paper';
+import { TextInput, Button, HelperText, Text, TouchableRipple } from 'react-native-paper';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useFinanzas } from '@/database/hooks/useFinanzas';
 import { Colors } from '@/constants/colors';
 import { getToday } from '@/utils/dateUtils';
@@ -58,13 +59,42 @@ export function GastoFormScreen({ navigation }: FinanzasScreenProps<'GastoForm'>
           left={<TextInput.Icon icon="calendar" />}
         />
 
-        <SegmentedButtons
-          value={categoria}
-          onValueChange={setCategoria}
-          buttons={CATEGORIAS_GASTO.slice(0, 4).map((c) => ({ value: c.value, label: c.label }))}
-          style={styles.segmented}
-          density="small"
-        />
+        <Text style={styles.fieldLabel}>Categor\u00eda del gasto</Text>
+        <View style={styles.catGrid}>
+          {CATEGORIAS_GASTO.map((c) => (
+            <TouchableRipple
+              key={c.value}
+              onPress={() => setCategoria(c.value)}
+              style={[
+                styles.catCard,
+                categoria === c.value && styles.catCardActive,
+              ]}
+              borderless
+            >
+              <View style={styles.catCardInner}>
+                <View style={[
+                  styles.catIconCircle,
+                  categoria === c.value && styles.catIconCircleActive,
+                ]}>
+                  <Icon
+                    name={c.icon}
+                    size={24}
+                    color={categoria === c.value ? Colors.white : Colors.error}
+                  />
+                </View>
+                <Text
+                  style={[
+                    styles.catLabel,
+                    categoria === c.value && styles.catLabelActive,
+                  ]}
+                  numberOfLines={1}
+                >
+                  {c.label}
+                </Text>
+              </View>
+            </TouchableRipple>
+          ))}
+        </View>
 
         <TextInput
           label="Monto *"
@@ -77,11 +107,12 @@ export function GastoFormScreen({ navigation }: FinanzasScreenProps<'GastoForm'>
         />
 
         <TextInput
-          label="Descripción"
+          label="Descripci\u00f3n"
           value={descripcion}
           onChangeText={setDescripcion}
           mode="outlined"
           style={styles.input}
+          left={<TextInput.Icon icon="text" />}
         />
 
         <TextInput
@@ -101,6 +132,7 @@ export function GastoFormScreen({ navigation }: FinanzasScreenProps<'GastoForm'>
           multiline
           numberOfLines={3}
           style={styles.input}
+          left={<TextInput.Icon icon="note-text" />}
         />
 
         {error ? <HelperText type="error" visible>{error}</HelperText> : null}
@@ -125,7 +157,61 @@ const styles = StyleSheet.create({
   flex: { flex: 1, backgroundColor: Colors.background },
   container: { padding: 16 },
   input: { marginBottom: 10 },
-  segmented: { marginBottom: 12 },
+  fieldLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: Colors.textSecondary,
+    marginBottom: 8,
+    marginTop: 4,
+  },
+  catGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginBottom: 16,
+  },
+  catCard: {
+    width: '30%',
+    flexGrow: 1,
+    borderRadius: 10,
+    borderWidth: 2,
+    borderColor: Colors.errorContainer,
+    backgroundColor: Colors.white,
+    overflow: 'hidden',
+    elevation: 1,
+  },
+  catCardActive: {
+    borderColor: Colors.error,
+    backgroundColor: Colors.errorContainer,
+    elevation: 3,
+  },
+  catCardInner: {
+    alignItems: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 4,
+    gap: 6,
+  },
+  catIconCircle: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: Colors.errorContainer,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  catIconCircleActive: {
+    backgroundColor: Colors.error,
+  },
+  catLabel: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: Colors.text,
+    textAlign: 'center',
+  },
+  catLabelActive: {
+    fontWeight: 'bold',
+    color: Colors.error,
+  },
   button: { marginTop: 16, borderRadius: 8 },
   buttonContent: { height: 52 },
 });

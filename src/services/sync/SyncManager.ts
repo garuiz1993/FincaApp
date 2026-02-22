@@ -15,6 +15,7 @@ const SYNC_TABLES = [
   { table: 'potreros', collection: 'potreros' },
   { table: 'rotacion', collection: 'rotacion' },
   { table: 'eventos_reproductivos', collection: 'eventos_reproductivos' },
+  { table: 'eventos_animal', collection: 'eventos_animal' },
 ];
 
 export async function syncAll(db: SQLiteDatabase, fincaId: string): Promise<SyncResult[]> {

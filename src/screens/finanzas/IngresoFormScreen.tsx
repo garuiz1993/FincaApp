@@ -109,7 +109,7 @@ export function IngresoFormScreen({ navigation }: FinanzasScreenProps<'IngresoFo
         />
 
         <TextInput
-          label="Descripci\u00f3n"
+          label="Descripción"
           value={descripcion}
           onChangeText={setDescripcion}
           mode="outlined"

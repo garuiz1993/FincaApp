@@ -10,8 +10,6 @@ import { getCurrentMonthRange } from '@/utils/dateUtils';
 
 interface DailyRecord {
   fecha: string;
-  litros_manana: number;
-  litros_tarde: number;
   total: number;
 }
 
@@ -26,7 +24,7 @@ export function ProduccionHistorialScreen() {
     try {
       const { start, end } = getCurrentMonthRange();
       const rows = await db.getAllAsync<DailyRecord>(
-        `SELECT fecha, litros_manana, litros_tarde, total
+        `SELECT fecha, total
          FROM produccion
          WHERE fecha BETWEEN ? AND ? AND deleted = 0
          ORDER BY fecha DESC`,
@@ -34,7 +32,6 @@ export function ProduccionHistorialScreen() {
       );
       setHistorial(rows);
 
-      // Cargar precio para estimacion
       const precioGuardado = await db.getFirstAsync<{ value: string }>(
         `SELECT value FROM configuracion WHERE key = 'precio_litro'`
       ).catch(() => null);
@@ -64,23 +61,13 @@ export function ProduccionHistorialScreen() {
         <Divider style={styles.divider} />
         <View style={styles.detailsRow}>
           <View style={styles.detail}>
-            <Icon name="weather-sunny" size={16} color={Colors.warning} />
-            <Text style={styles.detailValue}>{formatLiters(item.litros_manana)}</Text>
-            <Text style={styles.detailLabel}>Ma\u00f1ana</Text>
-          </View>
-          <View style={styles.detail}>
-            <Icon name="weather-night" size={16} color={Colors.info} />
-            <Text style={styles.detailValue}>{formatLiters(item.litros_tarde)}</Text>
-            <Text style={styles.detailLabel}>Tarde</Text>
-          </View>
-          <View style={styles.detail}>
-            <Icon name="sigma" size={16} color={Colors.primary} />
+            <Icon name="water" size={18} color={Colors.primary} />
             <Text style={[styles.detailValue, styles.totalValue]}>{formatLiters(item.total)}</Text>
-            <Text style={styles.detailLabel}>Total</Text>
+            <Text style={styles.detailLabel}>Producción</Text>
           </View>
           {precioLitro > 0 && (
             <View style={styles.detail}>
-              <Icon name="cash" size={16} color={Colors.success} />
+              <Icon name="cash" size={18} color={Colors.success} />
               <Text style={[styles.detailValue, { color: Colors.success }]}>
                 {formatCurrency(item.total * precioLitro)}
               </Text>
@@ -116,7 +103,7 @@ export function ProduccionHistorialScreen() {
           <Card.Content style={styles.summaryContent}>
             <Icon name="counter" size={24} color={Colors.white} />
             <Text style={styles.summaryValue}>{historial.length}</Text>
-            <Text style={styles.summaryLabel}>D\u00edas</Text>
+            <Text style={styles.summaryLabel}>Días</Text>
           </Card.Content>
         </Card>
       </View>
@@ -132,7 +119,7 @@ export function ProduccionHistorialScreen() {
           <View style={styles.emptyContainer}>
             <Icon name="clipboard-text-clock-outline" size={56} color={Colors.textSecondary} />
             <Text style={styles.emptyTitle}>Sin registros</Text>
-            <Text style={styles.emptyDesc}>No hay registros de producci\u00f3n este mes</Text>
+            <Text style={styles.emptyDesc}>No hay registros de producción este mes</Text>
           </View>
         }
       />
@@ -202,16 +189,16 @@ const styles = StyleSheet.create({
     gap: 2,
   },
   detailValue: {
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: 'bold',
     color: Colors.primary,
   },
   totalValue: {
-    fontSize: 16,
+    fontSize: 18,
     color: Colors.primaryDark,
   },
   detailLabel: {
-    fontSize: 10,
+    fontSize: 11,
     color: Colors.textSecondary,
   },
   emptyContainer: {

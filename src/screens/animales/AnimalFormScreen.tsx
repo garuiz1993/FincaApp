@@ -41,7 +41,7 @@ export function AnimalFormScreen({ route, navigation }: AnimalesScreenProps<'Ani
 
   const handleSave = async () => {
     if (!codigo.trim()) {
-      setError('El c\u00f3digo es obligatorio');
+      setError('El código es obligatorio');
       return;
     }
     if (!raza.trim()) {
@@ -75,7 +75,7 @@ export function AnimalFormScreen({ route, navigation }: AnimalesScreenProps<'Ani
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Error al guardar';
       if (message.includes('UNIQUE')) {
-        setError('Ya existe un animal con este c\u00f3digo');
+        setError('Ya existe un animal con este código');
       } else {
         setError(`Error al guardar: ${message}`);
       }

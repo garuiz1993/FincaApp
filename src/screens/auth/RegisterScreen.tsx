@@ -55,7 +55,7 @@ export function RegisterScreen({ navigation }: AuthScreenProps<'Register'>) {
         <View style={styles.header}>
           <Icon name="account-plus" size={56} color={Colors.primary} />
           <Text style={styles.title}>Crear Cuenta</Text>
-          <Text style={styles.subtitle}>Reg\u00edstrate para comenzar</Text>
+          <Text style={styles.subtitle}>Regístrate para comenzar</Text>
         </View>
 
         <View style={styles.form}>

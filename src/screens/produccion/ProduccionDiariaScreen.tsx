@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import { View, StyleSheet, ScrollView, Alert } from 'react-native';
-import { Card, Text, TextInput, Button, Divider, IconButton } from 'react-native-paper';
+import { Card, Text, TextInput, Button, Divider } from 'react-native-paper';
 import { useFocusEffect } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useSQLiteContext } from 'expo-sqlite';
@@ -13,10 +13,8 @@ import type { ProduccionScreenProps } from '@/navigation/types';
 export function ProduccionDiariaScreen({ navigation }: ProduccionScreenProps<'ProduccionDiaria'>) {
   const db = useSQLiteContext();
   const [fecha, setFecha] = useState(getToday());
-  const [litrosManana, setLitrosManana] = useState('');
-  const [litrosTarde, setLitrosTarde] = useState('');
+  const [litrosTotal, setLitrosTotal] = useState('');
   const [precioLitro, setPrecioLitro] = useState('');
-  const [totalDia, setTotalDia] = useState(0);
   const [produccionMes, setProduccionMes] = useState(0);
   const [loading, setLoading] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -26,20 +24,14 @@ export function ProduccionDiariaScreen({ navigation }: ProduccionScreenProps<'Pr
     try {
       const repo = new ProduccionRepository(db);
 
-      // Cargar registro del dia si existe
+      // Cargar registro del día si existe
       const registros = await repo.getByFecha(fecha);
       if (registros.length > 0) {
         const reg = registros[0];
-        setLitrosManana(reg.litros_manana > 0 ? reg.litros_manana.toString() : '');
-        setLitrosTarde(reg.litros_tarde > 0 ? reg.litros_tarde.toString() : '');
+        setLitrosTotal(reg.total > 0 ? reg.total.toString() : '');
       } else {
-        setLitrosManana('');
-        setLitrosTarde('');
+        setLitrosTotal('');
       }
-
-      // Total del dia
-      const total = await repo.getTotalByFecha(fecha);
-      setTotalDia(total);
 
       // Total del mes
       const { start, end } = getCurrentMonthRange();
@@ -62,7 +54,6 @@ export function ProduccionDiariaScreen({ navigation }: ProduccionScreenProps<'Pr
 
   useFocusEffect(
     useCallback(() => {
-      // Crear tabla configuracion si no existe
       db.execAsync(`
         CREATE TABLE IF NOT EXISTS configuracion (
           key TEXT PRIMARY KEY,
@@ -73,36 +64,38 @@ export function ProduccionDiariaScreen({ navigation }: ProduccionScreenProps<'Pr
   );
 
   const handleSave = async () => {
-    const manana = parseFloat(litrosManana) || 0;
-    const tarde = parseFloat(litrosTarde) || 0;
+    const total = parseFloat(litrosTotal) || 0;
 
-    if (manana === 0 && tarde === 0) {
-      Alert.alert('Atenci\u00f3n', 'Ingresa al menos un valor de producci\u00f3n');
+    if (total <= 0) {
+      Alert.alert('Atención', 'Ingresa la producción del día');
       return;
     }
 
     setLoading(true);
     try {
       const repo = new ProduccionRepository(db);
-      // Usar un ID general "LOTE" para produccion general
       await repo.upsert({
         id_animal: 'LOTE_GENERAL',
         fecha,
-        litros_manana: manana,
-        litros_tarde: tarde,
+        litros_manana: 0,
+        litros_tarde: 0,
         notas: null,
       });
 
-      // Guardar precio si se ingreso
+      // Actualizar el total directamente
+      await db.runAsync(
+        `UPDATE produccion SET total = ?, updated_at = datetime('now'), synced = 0
+         WHERE id_animal = 'LOTE_GENERAL' AND fecha = ? AND deleted = 0`,
+        [total, fecha]
+      );
+
+      // Guardar precio si se ingresó
       if (precioLitro) {
         await db.runAsync(
           `INSERT OR REPLACE INTO configuracion (key, value) VALUES ('precio_litro', ?)`,
           [precioLitro]
         );
       }
-
-      const total = await repo.getTotalByFecha(fecha);
-      setTotalDia(total);
 
       const { start, end } = getCurrentMonthRange();
       const totalMes = await repo.getTotalByRango(start, end);
@@ -114,10 +107,9 @@ export function ProduccionDiariaScreen({ navigation }: ProduccionScreenProps<'Pr
     }
   };
 
-  const totalHoy = (parseFloat(litrosManana) || 0) + (parseFloat(litrosTarde) || 0);
+  const totalHoy = parseFloat(litrosTotal) || 0;
   const precio = parseFloat(precioLitro) || 0;
   const ingresoEstimadoHoy = totalHoy * precio;
-  const { start, end } = getCurrentMonthRange();
   const ingresoEstimadoMes = produccionMes * precio;
 
   return (
@@ -125,57 +117,38 @@ export function ProduccionDiariaScreen({ navigation }: ProduccionScreenProps<'Pr
       {/* Header */}
       <View style={styles.header}>
         <Icon name="water-outline" size={22} color={Colors.white} />
-        <Text style={styles.headerTitle}>Producci\u00f3n Diaria</Text>
+        <Text style={styles.headerTitle}>Producción Diaria</Text>
         <Text style={styles.headerDate}>{fecha}</Text>
       </View>
 
-      {/* Registro del dia */}
+      {/* Registro del día */}
       <Card style={styles.card}>
         <Card.Content>
           <View style={styles.sectionHeader}>
-            <Icon name="clock-outline" size={20} color={Colors.primary} />
-            <Text style={styles.sectionTitle}>Registro del D\u00eda</Text>
+            <Icon name="water" size={20} color={Colors.primary} />
+            <Text style={styles.sectionTitle}>Registro del Día</Text>
           </View>
           <Divider style={styles.divider} />
 
-          <View style={styles.inputRow}>
-            <View style={styles.inputGroup}>
-              <View style={styles.inputLabelRow}>
-                <Icon name="weather-sunny" size={16} color={Colors.warning} />
-                <Text style={styles.inputLabel}>Ma\u00f1ana (L)</Text>
-              </View>
-              <TextInput
-                value={litrosManana}
-                onChangeText={setLitrosManana}
-                mode="outlined"
-                keyboardType="numeric"
-                placeholder="0.0"
-                style={styles.bigInput}
-                contentStyle={styles.bigInputContent}
-              />
-            </View>
-            <View style={styles.inputGroup}>
-              <View style={styles.inputLabelRow}>
-                <Icon name="weather-night" size={16} color={Colors.info} />
-                <Text style={styles.inputLabel}>Tarde (L)</Text>
-              </View>
-              <TextInput
-                value={litrosTarde}
-                onChangeText={setLitrosTarde}
-                mode="outlined"
-                keyboardType="numeric"
-                placeholder="0.0"
-                style={styles.bigInput}
-                contentStyle={styles.bigInputContent}
-              />
-            </View>
-          </View>
+          <Text style={styles.inputLabel}>Producción total del lote (litros)</Text>
+          <TextInput
+            value={litrosTotal}
+            onChangeText={(val) => { setLitrosTotal(val); setSaved(false); }}
+            mode="outlined"
+            keyboardType="numeric"
+            placeholder="0.0"
+            style={styles.bigInput}
+            contentStyle={styles.bigInputContent}
+            left={<TextInput.Icon icon="water" />}
+          />
 
-          <View style={styles.totalRow}>
-            <Icon name="sigma" size={20} color={Colors.primary} />
-            <Text style={styles.totalLabel}>Total del d\u00eda:</Text>
-            <Text style={styles.totalValue}>{formatLiters(totalHoy)}</Text>
-          </View>
+          {totalHoy > 0 && (
+            <View style={styles.totalRow}>
+              <Icon name="check-circle" size={20} color={Colors.primaryDark} />
+              <Text style={styles.totalLabel}>Total del día:</Text>
+              <Text style={styles.totalValue}>{formatLiters(totalHoy)}</Text>
+            </View>
+          )}
 
           <Button
             mode="contained"
@@ -186,17 +159,17 @@ export function ProduccionDiariaScreen({ navigation }: ProduccionScreenProps<'Pr
             contentStyle={styles.saveButtonContent}
             icon={saved ? 'check-circle' : 'content-save'}
           >
-            {saved ? 'Guardado' : 'Guardar Producci\u00f3n'}
+            {saved ? 'Guardado' : 'Guardar Producción'}
           </Button>
         </Card.Content>
       </Card>
 
-      {/* Precio y estimacion */}
+      {/* Precio y estimación */}
       <Card style={styles.card}>
         <Card.Content>
           <View style={styles.sectionHeader}>
             <Icon name="currency-usd" size={20} color={Colors.success} />
-            <Text style={styles.sectionTitle}>Estimaci\u00f3n de Ingresos</Text>
+            <Text style={styles.sectionTitle}>Estimación de Ingresos</Text>
           </View>
           <Divider style={styles.divider} />
 
@@ -232,7 +205,7 @@ export function ProduccionDiariaScreen({ navigation }: ProduccionScreenProps<'Pr
 
               <View style={styles.produccionMesRow}>
                 <Icon name="water" size={16} color={Colors.primary} />
-                <Text style={styles.produccionMesLabel}>Producci\u00f3n acumulada del mes:</Text>
+                <Text style={styles.produccionMesLabel}>Producción acumulada del mes:</Text>
                 <Text style={styles.produccionMesValue}>{formatLiters(produccionMes)}</Text>
               </View>
             </>
@@ -240,7 +213,7 @@ export function ProduccionDiariaScreen({ navigation }: ProduccionScreenProps<'Pr
         </Card.Content>
       </Card>
 
-      {/* Boton historial */}
+      {/* Botón historial */}
       <Button
         mode="outlined"
         icon="history"
@@ -248,7 +221,7 @@ export function ProduccionDiariaScreen({ navigation }: ProduccionScreenProps<'Pr
         style={styles.historyButton}
         contentStyle={styles.historyButtonContent}
       >
-        Ver Historial de Producci\u00f3n
+        Ver Historial de Producción
       </Button>
 
       <View style={{ height: 32 }} />
@@ -298,29 +271,17 @@ const styles = StyleSheet.create({
   divider: {
     marginVertical: 12,
   },
-  inputRow: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  inputGroup: {
-    flex: 1,
-  },
-  inputLabelRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    marginBottom: 4,
-  },
   inputLabel: {
-    fontSize: 13,
+    fontSize: 14,
     color: Colors.textSecondary,
     fontWeight: '600',
+    marginBottom: 8,
   },
   bigInput: {
     fontSize: 20,
   },
   bigInputContent: {
-    height: 52,
+    height: 56,
   },
   totalRow: {
     flexDirection: 'row',

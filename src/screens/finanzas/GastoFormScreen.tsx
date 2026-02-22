@@ -59,7 +59,7 @@ export function GastoFormScreen({ navigation }: FinanzasScreenProps<'GastoForm'>
           left={<TextInput.Icon icon="calendar" />}
         />
 
-        <Text style={styles.fieldLabel}>Categor\u00eda del gasto</Text>
+        <Text style={styles.fieldLabel}>Categoría del gasto</Text>
         <View style={styles.catGrid}>
           {CATEGORIAS_GASTO.map((c) => (
             <TouchableRipple
@@ -107,7 +107,7 @@ export function GastoFormScreen({ navigation }: FinanzasScreenProps<'GastoForm'>
         />
 
         <TextInput
-          label="Descripci\u00f3n"
+          label="Descripción"
           value={descripcion}
           onChangeText={setDescripcion}
           mode="outlined"

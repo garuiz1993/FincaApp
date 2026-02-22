@@ -100,7 +100,7 @@ export function AnimalDetailScreen({ route, navigation }: AnimalesScreenProps<'A
         <Card.Content>
           <View style={styles.sectionHeader}>
             <Icon name="information-outline" size={20} color={Colors.primary} />
-            <Text style={styles.sectionTitle}>Informaci\u00f3n General</Text>
+            <Text style={styles.sectionTitle}>Información General</Text>
           </View>
           <Divider style={styles.divider} />
 

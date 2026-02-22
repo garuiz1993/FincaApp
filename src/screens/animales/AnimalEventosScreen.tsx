@@ -45,7 +45,7 @@ export function AnimalEventosScreen({ route }: AnimalesScreenProps<'AnimalEvento
 
   const handleSave = async () => {
     if (!descripcion.trim()) {
-      Alert.alert('Atenci\u00f3n', 'La descripci\u00f3n del evento es obligatoria');
+      Alert.alert('Atención', 'La descripción del evento es obligatoria');
       return;
     }
 
@@ -76,7 +76,7 @@ export function AnimalEventosScreen({ route }: AnimalesScreenProps<'AnimalEvento
   const handleDelete = (evento: EventoAnimal) => {
     Alert.alert(
       'Eliminar Evento',
-      '\u00bfEst\u00e1s seguro de eliminar este evento?',
+      '¿Estás seguro de eliminar este evento?',
       [
         { text: 'Cancelar', style: 'cancel' },
         {
@@ -229,7 +229,7 @@ export function AnimalEventosScreen({ route }: AnimalesScreenProps<'AnimalEvento
           />
 
           <TextInput
-            label="Descripci\u00f3n *"
+            label="Descripción *"
             value={descripcion}
             onChangeText={setDescripcion}
             mode="outlined"
